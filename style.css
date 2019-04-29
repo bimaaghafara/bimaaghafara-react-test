@@ -1,0 +1,26 @@
+h1, p {
+  font-family: Lato;
+}
+
+body {
+  padding: 20px 0;
+  min-width: 580px;
+}
+
+.group {
+  border: 1px solid lightgrey;
+  padding: 10px;
+  margin: 10px;
+  float: left;
+}
+
+.seat {
+  border: 1px solid lightgrey;
+  padding: 10px;
+  margin: 1px;
+  float: left;
+}
+
+.seat.clearfix {
+  clear: left
+}
