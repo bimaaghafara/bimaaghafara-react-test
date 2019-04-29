@@ -21,6 +21,16 @@ body {
   float: left;
 }
 
+.seat.window{
+  background-color: green
+}
+.seat.middle{
+  background-color: red
+}
+.seat.aisle{
+  background-color: blue
+}
+
 .seat.clearfix {
   clear: left
 }

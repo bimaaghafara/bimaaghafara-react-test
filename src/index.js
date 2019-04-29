@@ -9,7 +9,7 @@ class App extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      seatsInput: "[[3,2], [4,3], [2,3], [3,4]]",
+      seatsInput: "[ [3,2], [4,3], [2,3], [3,4] ]",
       groups: []
     };
 
@@ -22,19 +22,39 @@ class App extends Component {
     this.setState({[id]: value});
   }
 
+  identifySeatType(groupIndex, groupLength, colIndex, groupSumCol) {
+    const isLeftWindow = groupIndex===0 && colIndex===0;
+    const isRightWindow = groupIndex===groupLength-1 && colIndex===groupSumCol-1;
+    const isFirstColInGroup = colIndex===0;
+    const isLastColInGroup = colIndex===groupSumCol-1;
+    if (isLeftWindow || isRightWindow) {
+      return 'window'
+    } if (isFirstColInGroup || isLastColInGroup) {
+      return 'aisle'
+    } else {
+      return 'middle'
+    }
+  
+  }
+
   createGroups = (seatsInput) => {
-    return JSON.parse(seatsInput).map((group) => {
+    const groups = JSON.parse(seatsInput);
+    return groups.map((group, groupIndex) => {
       let seats = [];
-      const col = group[0];
-      const row = group[1];
-      for (let r=0; r<row; r++) {
-        for (let c=0; c<col; c++) {
-          seats.push({row:r, col:c}) 
+      const sumCol = group[0];
+      const sumRow = group[1];
+      for (let row=0; row<sumRow; row++) {
+        for (let col=0; col<sumCol; col++) {
+          seats.push({
+            row: row,
+            col: col,
+            type: this.identifySeatType(groupIndex, groups.length, col, sumCol)
+          }) 
         }
       }
       return {
-        col: col,
-        row: row,
+        sumCol: sumCol,
+        sumRow: sumRow,
         seats: seats
       };
     });
@@ -48,7 +68,7 @@ class App extends Component {
 
   render() {
     return (
-      <div class="container">
+      <div className="container">
 
         <div className="form-group">
           <label>Seats Input</label>
@@ -56,15 +76,15 @@ class App extends Component {
         </div>
 
         <div className="form-group">
-          <button onClick={() => this.calculate()} class="btn btn-success">Calculate</button>
+          <button onClick={() => this.calculate()} className="btn btn-success">Calculate</button>
         </div>
 
         {this.state.groups.map((group, groupIndex) =>
-          <div class="group">
+          <div key={`group-${groupIndex}`} className="group">
             <div>Group {groupIndex}</div>
             <br></br>
             {group.seats.map((seat, seatIndex) =>
-              <div className={seatIndex % group.col === 0 ? 'seat clearfix' : 'seat'}>x</div>
+              <div key={`seat-${seatIndex}`} className={`seat ${seatIndex%group.sumCol===0 ? 'clearfix' : ''} ${seat.type}`}>x</div>
             )}
           </div>
         )}
