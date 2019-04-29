@@ -39,10 +39,14 @@ class App extends Component {
 
   createGroups = (seatsInput) => {
     const groups = JSON.parse(seatsInput);
+    let colOffset = 0;
     return groups.map((group, groupIndex) => {
       let seats = [];
       const sumCol = group[0];
       const sumRow = group[1];
+      if (groupIndex > 0) {
+        colOffset += groups[groupIndex-1][0];
+      }
       for (let row=0; row<sumRow; row++) {
         for (let col=0; col<sumCol; col++) {
           seats.push({
@@ -53,6 +57,7 @@ class App extends Component {
         }
       }
       return {
+        colOffset: colOffset,
         sumCol: sumCol,
         sumRow: sumRow,
         seats: seats
@@ -61,6 +66,7 @@ class App extends Component {
   }
 
   calculate = () => {
+    console.log(this.createGroups(this.state.seatsInput));
     this.setState({
       groups: this.createGroups(this.state.seatsInput)
     })
