@@ -22,22 +22,33 @@ class App extends Component {
   }
 
   identifyPassengersNumber(groups, sumPassengers) {
-    // const maxCol = Math.max.apply(null, groups.map(el => el.sumCol));
     const maxRow = Math.max.apply(null, groups.map(el => el.sumRow));
-    let pn = 1;
-    for (let row=0; row<maxRow; row++) {
-      groups.forEach((group, groupIndex) => {
-        if (row < group.sumRow) {
-          for (let col=0; col<group.sumCol; col++){
-            const seatIndex = group.seats.findIndex(seat => seat.row===row && seat.col===col);
-            groups[groupIndex].seats[seatIndex].passengerNumber = pn;
-            pn++;
+    let passengerNumber = 1;
+    const iterateBySeatType = (seatType) => {
+      for (let row=0; row<maxRow; row++) {
+        if (passengerNumber > sumPassengers) {break}
+        for (let groupIndex=0; groupIndex<groups.length; groupIndex++) {
+          if (passengerNumber > sumPassengers) {break}
+          const group = groups[groupIndex];
+          if (row < group.sumRow) {
+            for (let col=0; col<group.sumCol; col++){
+              if (passengerNumber > sumPassengers) {break}
+              const seatIndex = group.seats.findIndex(seat => seat.row===row && seat.col===col);
+              const seat = group.seats[seatIndex];
+              if (seat.type === seatType) {
+                seat.passengerNumber = passengerNumber;
+                passengerNumber++;
+              }
+            }
           }
-        }
-      });
+        };
+      }
     }
-
+    iterateBySeatType('aisle');
+    iterateBySeatType('window');
+    iterateBySeatType('middle');
     setTimeout(() => {
+      console.log(groups);
       this.setState({groups: groups});
     }, 100)
   }
