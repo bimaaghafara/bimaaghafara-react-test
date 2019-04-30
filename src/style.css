@@ -7,28 +7,34 @@ body {
   min-width: 580px;
 }
 
+.group-wrapper {
+  padding: 20px 0;
+}
+
 .group {
-  border: 1px solid lightgrey;
-  padding: 10px;
-  margin: 10px;
+  margin-right: 25px;
   float: left;
 }
 
+.group .title {
+  text-align: center;
+  margin-bottom: 10px;
+}
+
 .seat {
-  border: 1px solid lightgrey;
   padding: 10px;
   margin: 1px;
   float: left;
 }
 
 .seat.window{
-  background-color: green
+  background-color: #aac46c;
 }
 .seat.middle{
-  background-color: red
+  background-color: #cd655f;
 }
 .seat.aisle{
-  background-color: blue
+  background-color: #6095c9;
 }
 
 .seat.clearfix {

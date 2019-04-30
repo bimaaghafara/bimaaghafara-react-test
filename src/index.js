@@ -65,11 +65,15 @@ class App extends Component {
     });
   }
 
-  calculate = () => {
+  generateOutput = () => {
     console.log(this.createGroups(this.state.seatsInput));
     this.setState({
       groups: this.createGroups(this.state.seatsInput)
     })
+  }
+
+  componentWillMount() {
+    this.generateOutput();
   }
 
   render() {
@@ -82,18 +86,19 @@ class App extends Component {
         </div>
 
         <div className="form-group">
-          <button onClick={() => this.calculate()} className="btn btn-success">Calculate</button>
+          <button onClick={() => this.generateOutput()} className="btn btn-success">Generate Output</button>
         </div>
 
-        {this.state.groups.map((group, groupIndex) =>
-          <div key={`group-${groupIndex}`} className="group">
-            <div>Group {groupIndex}</div>
-            <br></br>
-            {group.seats.map((seat, seatIndex) =>
-              <div key={`seat-${seatIndex}`} className={`seat ${seatIndex%group.sumCol===0 ? 'clearfix' : ''} ${seat.type}`}>x</div>
-            )}
-          </div>
-        )}
+        <div className="group-wrapper">
+          {this.state.groups.map((group, groupIndex) =>
+            <div key={`group-${groupIndex}`} className="group">
+              <div className="title">Group {groupIndex}</div>
+              {group.seats.map((seat, seatIndex) =>
+                <div key={`seat-${seatIndex}`} className={`seat ${seatIndex%group.sumCol===0 ? 'clearfix' : ''} ${seat.type}`}>x</div>
+              )}
+            </div>
+          )}
+        </div>
 
       </div>
     );
