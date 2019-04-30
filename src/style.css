@@ -45,3 +45,7 @@ body {
 .seat.clearfix {
   clear: left
 }
+
+.form-control {
+  max-width: 300px;
+}

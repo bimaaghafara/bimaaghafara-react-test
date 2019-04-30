@@ -10,6 +10,7 @@ class App extends Component {
     super(props);
     this.state = {
       seatsInput: "[ [3,2], [4,3], [2,3], [3,4] ]",
+      sumPassengers: 0,
       groups: []
     };
     this.handleInputChange = this.handleInputChange.bind(this);
@@ -18,7 +19,12 @@ class App extends Component {
   handleInputChange(event) {
     const id = event.target.id;
     const value = event.target.value;
-    this.setState({[id]: value});
+    this.setState({[id]: value}, () => {
+      // for debugging only, try to change total passengers field
+      if (id === 'sumPassengers') {
+        this.generateOutput();
+      }
+    });
   }
 
   identifyPassengersNumber(groups, sumPassengers) {
@@ -48,7 +54,6 @@ class App extends Component {
     iterateBySeatType('window');
     iterateBySeatType('middle');
     setTimeout(() => {
-      console.log(groups);
       this.setState({groups: groups});
     }, 100)
   }
@@ -100,7 +105,7 @@ class App extends Component {
     this.setState({
       groups: this.createGroups(this.state.seatsInput)
     }, () => {
-      this.identifyPassengersNumber(this.state.groups, 30);
+      this.identifyPassengersNumber(this.state.groups, this.state.sumPassengers);
     })
   }
 
@@ -115,6 +120,11 @@ class App extends Component {
         <div className="form-group">
           <label>Seats Input</label>
           <input type="text" className="form-control" id="seatsInput" value={this.state.seatsInput} onChange={this.handleInputChange} />
+        </div>
+
+        <div className="form-group">
+          <label>Total Passengers</label>
+          <input type="number" min="0" className="form-control" id="sumPassengers" value={this.state.sumPassengers} onChange={this.handleInputChange} />
         </div>
 
         <div className="form-group">
