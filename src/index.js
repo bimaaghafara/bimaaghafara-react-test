@@ -12,7 +12,6 @@ class App extends Component {
       seatsInput: "[ [3,2], [4,3], [2,3], [3,4] ]",
       groups: []
     };
-
     this.handleInputChange = this.handleInputChange.bind(this);
   }
 
@@ -20,6 +19,27 @@ class App extends Component {
     const id = event.target.id;
     const value = event.target.value;
     this.setState({[id]: value});
+  }
+
+  identifyPassengersNumber(groups, sumPassengers) {
+    // const maxCol = Math.max.apply(null, groups.map(el => el.sumCol));
+    const maxRow = Math.max.apply(null, groups.map(el => el.sumRow));
+    let pn = 1;
+    for (let row=0; row<maxRow; row++) {
+      groups.forEach((group, groupIndex) => {
+        if (row < group.sumRow) {
+          for (let col=0; col<group.sumCol; col++){
+            const seatIndex = group.seats.findIndex(seat => seat.row===row && seat.col===col);
+            groups[groupIndex].seats[seatIndex].passengerNumber = pn;
+            pn++;
+          }
+        }
+      });
+    }
+
+    setTimeout(() => {
+      this.setState({groups: groups});
+    }, 100)
   }
 
   identifySeatType(groupIndex, groupLength, colIndex, groupSumCol) {
@@ -66,9 +86,10 @@ class App extends Component {
   }
 
   generateOutput = () => {
-    console.log(this.createGroups(this.state.seatsInput));
     this.setState({
       groups: this.createGroups(this.state.seatsInput)
+    }, () => {
+      this.identifyPassengersNumber(this.state.groups, 30);
     })
   }
 
@@ -94,7 +115,9 @@ class App extends Component {
             <div key={`group-${groupIndex}`} className="group">
               <div className="title">Group {groupIndex}</div>
               {group.seats.map((seat, seatIndex) =>
-                <div key={`seat-${seatIndex}`} className={`seat ${seatIndex%group.sumCol===0 ? 'clearfix' : ''} ${seat.type}`}>x</div>
+                <div key={`seat-${seatIndex}`} className={`seat ${seatIndex%group.sumCol===0 ? 'clearfix' : ''} ${seat.type}`}>
+                  {seat.passengerNumber}
+                </div>
               )}
             </div>
           )}
