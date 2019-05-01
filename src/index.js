@@ -11,9 +11,10 @@ class App extends Component {
     this.state = {
       seatsInput: "[ [3,2], [4,3], [2,3], [3,4] ]",
       seatsInputValidity: true,
-      sumPassengers: 0,
+      seatsInputErrorMessage: '',
+      sumPassengers: 30,
       sumPassengersValidity: true,
-      maxPassengers: 0,
+      sumPassengersErrorMessage: '',
       showErrors: false,
       groups: []
     };
@@ -117,20 +118,58 @@ class App extends Component {
     }
   }
 
-  isFormValid() {
-    const seatsInput = JSON.parse(this.state.seatsInput);
-    let maxPassengers = 0;
-    seatsInput.forEach(group => maxPassengers += group[0]*group[1]);
-    let sumPassengersValidity = this.state.sumPassengers > maxPassengers? false : true;
-    this.setState({
-      sumPassengersValidity: sumPassengersValidity,
-      maxPassengers: maxPassengers
-    });
-    return sumPassengersValidity;
+  isAllChildIsArray(array) {
+    let _return = true;
+    array.forEach(child => _return = _return && Array.isArray(child));
+    return _return;
   }
 
-  componentWillMount() {
-    // this.generateOutput();
+  isFormValid() {
+    let seatsInput;
+    let sumPassengersValidity = true;
+    let seatsInputValidity = true;
+    let maxPassengers = 0;
+    let seatsInputErrorMessage;
+    let sumPassengersErrorMessage;
+
+    // validate seatsInput
+    try {
+      seatsInput = JSON.parse(this.state.seatsInput);
+      if (!Array.isArray(seatsInput)) {
+        seatsInputValidity = false;
+      } else {
+        seatsInput.forEach(child => {
+          seatsInputValidity = seatsInputValidity && Array.isArray(child) && child.length === 2 && child[0]>0 && child[1]>0;
+        });
+      }
+      seatsInputErrorMessage = seatsInputValidity? '' : 'Please enter valid 2D array with positive number only! For example: \n- [ [2,5] ]  \n- [ [3,2], [4,2] ]  \n- [ [4,2], [2,3], [5,6] ] \n- etc...';
+    } catch (error) {
+      seatsInputValidity = false;
+      seatsInputErrorMessage = error.message;
+    }
+
+    // validate sumPassengers when seatsInput is valid
+    if (seatsInputValidity) {
+      if (this.state.sumPassengers > 0) {
+        seatsInput.forEach(group => maxPassengers += group[0]*group[1]);
+        sumPassengersValidity = this.state.sumPassengers > maxPassengers? false : true;
+        sumPassengersErrorMessage = sumPassengersValidity? '' : `Based on your seats input, maximum passengers is ${maxPassengers}!`;
+      } else {
+        sumPassengersValidity = false;
+        sumPassengersErrorMessage = 'Passengers number must be greater than zero!'
+      }
+    }
+
+    // update state
+    this.setState({
+      seatsInputValidity: seatsInputValidity,
+      seatsInputErrorMessage: seatsInputErrorMessage,
+      sumPassengersValidity: sumPassengersValidity,
+      sumPassengersErrorMessage: sumPassengersErrorMessage
+    });
+
+    // result of form validity
+    return seatsInputValidity && sumPassengersValidity;
   }
 
   render() {
@@ -142,13 +181,20 @@ class App extends Component {
         <div className="form-group">
           <label>Seats Input</label>
           <input type="text" className="form-control" id="seatsInput" value={this.state.seatsInput} onChange={this.handleInputChange} />
+          {(this.state.showErrors && !this.state.seatsInputValidity) &&
+            <div className="error-message">   
+              Error: {this.state.seatsInputErrorMessage}
+            </div>
+          }
         </div>
 
         <div className="form-group">
           <label>Total Passengers</label>
-          <input type="number" min="0" className="form-control" id="sumPassengers" value={this.state.sumPassengers} onChange={this.handleInputChange} />
+          <input type="number" min="1" className="form-control" id="sumPassengers" value={this.state.sumPassengers} onChange={this.handleInputChange} />
           {(this.state.showErrors && !this.state.sumPassengersValidity) &&
-            <div className="error-message">Based on your seats input, maximum passengers is {this.state.maxPassengers}!</div>
+            <div className="error-message">
+              Error: {this.state.sumPassengersErrorMessage}
+            </div>
           }
         </div>
 
