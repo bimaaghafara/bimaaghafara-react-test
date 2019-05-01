@@ -1,0 +1,59 @@
+h1, p {
+  font-family: Lato;
+}
+
+body {
+  padding: 20px 0;
+  min-width: 650px;
+}
+
+.page-title {
+  margin: 20px 0;
+}
+
+.form-group {
+  max-width: 360px;
+  margin-bottom: 20px;
+  .error-message {
+    padding-top: 8px;
+    color: red;
+  }
+}
+
+.group-wrapper {
+  padding: 20px 0;
+  .group {
+    margin-right: 25px;
+    float: left;
+    .title {
+      text-align: center;
+      margin-bottom: 10px;
+    }
+    .seat {
+      width: 40px;
+      height: 40px;
+      text-align: center;
+      color: #fff;
+      font-weight: 600;
+      padding: 10px;
+      margin: 1px;
+      float: left;
+      &.window{
+        background-color: #aac46c;
+      }
+      &.middle{
+        background-color: #cd655f;
+      }
+      &.aisle{
+        background-color: #6095c9;
+      }
+      &.clearfix {
+        clear: left
+      }
+    }
+  }
+}
+
+.generate-output-wrapper {
+  padding: 10px 0;
+}
