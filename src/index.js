@@ -10,7 +10,11 @@ class App extends Component {
     super(props);
     this.state = {
       seatsInput: "[ [3,2], [4,3], [2,3], [3,4] ]",
+      seatsInputValidity: true,
       sumPassengers: 0,
+      sumPassengersValidity: true,
+      maxPassengers: 0,
+      showErrors: false,
       groups: []
     };
     this.handleInputChange = this.handleInputChange.bind(this);
@@ -19,11 +23,9 @@ class App extends Component {
   handleInputChange(event) {
     const id = event.target.id;
     const value = event.target.value;
-    this.setState({[id]: value}, () => {
-      // for debugging only, try to change total passengers field
-      if (id === 'sumPassengers') {
-        this.generateOutput();
-      }
+    this.setState({
+      [id]: value,
+      [id + 'Validity']: true
     });
   }
 
@@ -102,20 +104,39 @@ class App extends Component {
   }
 
   generateOutput = () => {
+    this.setState({groups: []});
+    if (this.isFormValid()) {
+      this.setState({
+        groups: this.createGroups(this.state.seatsInput)
+      }, () => {
+        this.identifyPassengersNumber(this.state.groups, this.state.sumPassengers);
+      })
+    } else {
+      this.setState({showErrors: true});
+    }
+  }
+
+  isFormValid() {
+    const seatsInput = JSON.parse(this.state.seatsInput);
+    let maxPassengers = 0;
+    seatsInput.forEach(group => maxPassengers += group[0]*group[1]);
+    let sumPassengersValidity = this.state.sumPassengers > maxPassengers? false : true;
     this.setState({
-      groups: this.createGroups(this.state.seatsInput)
-    }, () => {
-      this.identifyPassengersNumber(this.state.groups, this.state.sumPassengers);
-    })
+      sumPassengersValidity: sumPassengersValidity,
+      maxPassengers: maxPassengers
+    });
+    return sumPassengersValidity;
   }
 
   componentWillMount() {
-    this.generateOutput();
+    // this.generateOutput();
   }
 
   render() {
     return (
       <div className="container">
+
+        <h2 className="page-title">Airplane Seating Algorithm</h2>
 
         <div className="form-group">
           <label>Seats Input</label>
@@ -125,9 +146,12 @@ class App extends Component {
         <div className="form-group">
           <label>Total Passengers</label>
           <input type="number" min="0" className="form-control" id="sumPassengers" value={this.state.sumPassengers} onChange={this.handleInputChange} />
+          {(this.state.showErrors && !this.state.sumPassengersValidity) &&
+            <div className="error-message">Based on your seats input, maximum passengers is {this.state.maxPassengers}!</div>
+          }
         </div>
 
-        <div className="form-group">
+        <div className="generate-output-wrapper">
           <button onClick={() => this.generateOutput()} className="btn btn-success">Generate Output</button>
         </div>
 

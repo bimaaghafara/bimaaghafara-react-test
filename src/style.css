@@ -7,6 +7,10 @@ body {
   min-width: 650px;
 }
 
+.page-title {
+  margin: 20px 0;
+}
+
 .group-wrapper {
   padding: 20px 0;
 }
@@ -46,6 +50,16 @@ body {
   clear: left
 }
 
-.form-control {
-  max-width: 300px;
+.form-group {
+  max-width: 360px;
+  margin-bottom: 20px;
+}
+
+.form-group .error-message {
+  padding-top: 8px;
+  color: red;
+}
+
+.generate-output-wrapper {
+  padding: 10px 0;
 }
