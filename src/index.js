@@ -21,6 +21,7 @@ class App extends Component {
     this.handleInputChange = this.handleInputChange.bind(this);
   }
 
+  // function to handle form input change
   handleInputChange(event) {
     const id = event.target.id;
     const value = event.target.value;
@@ -30,83 +31,12 @@ class App extends Component {
     });
   }
 
-  identifyPassengersNumber(groups, sumPassengers) {
-    const maxRow = Math.max.apply(null, groups.map(el => el.sumRow));
-    let passengerNumber = 1;
-    const iterateBySeatType = (seatType) => {
-      for (let row=0; row<maxRow; row++) {
-        if (passengerNumber > sumPassengers) {break}
-        for (let groupIndex=0; groupIndex<groups.length; groupIndex++) {
-          if (passengerNumber > sumPassengers) {break}
-          const group = groups[groupIndex];
-          if (row < group.sumRow) {
-            for (let col=0; col<group.sumCol; col++){
-              if (passengerNumber > sumPassengers) {break}
-              const seatIndex = group.seats.findIndex(seat => seat.row===row && seat.col===col);
-              const seat = group.seats[seatIndex];
-              if (seat.type === seatType) {
-                seat.passengerNumber = passengerNumber;
-                passengerNumber++;
-              }
-            }
-          }
-        };
-      }
-    }
-    iterateBySeatType('aisle');
-    iterateBySeatType('window');
-    iterateBySeatType('middle');
-    setTimeout(() => {
-      this.setState({groups: groups}, () => {
-        // you can inspect this.state.groups after successfully generate output
-        // this code will print this.state.groups in console
-        console.clear();
-        console.log(this.state.groups);
-      });
-    }, 100)
-  }
-
-  identifySeatType(groupIndex, groupLength, colIndex, groupSumCol) {
-    const isLeftWindow = groupIndex===0 && colIndex===0;
-    const isRightWindow = groupIndex===groupLength-1 && colIndex===groupSumCol-1;
-    const isFirstColInGroup = colIndex===0;
-    const isLastColInGroup = colIndex===groupSumCol-1;
-    if (isLeftWindow || isRightWindow) {
-      return 'window'
-    } if (isFirstColInGroup || isLastColInGroup) {
-      return 'aisle'
-    } else {
-      return 'middle'
-    }
-  
-  }
-
-  createGroups = (seatsInput) => {
-    const groups = JSON.parse(seatsInput);
-    return groups.map((group, groupIndex) => {
-      let seats = [];
-      const sumCol = group[0];
-      const sumRow = group[1];
-      for (let row=0; row<sumRow; row++) {
-        for (let col=0; col<sumCol; col++) {
-          seats.push({
-            row: row,
-            col: col,
-            type: this.identifySeatType(groupIndex, groups.length, col, sumCol),
-            passengerNumber: null
-          }) 
-        }
-      }
-      return {
-        sumCol: sumCol,
-        sumRow: sumRow,
-        seats: seats
-      };
-    });
-  }
-
+  // function to generate output and show output in UI
   generateOutput = () => {
+    // reset groups whenever user click button generate output
     this.setState({groups: []});
+
+    // validate form before generate output
     if (this.isFormValid()) {
       this.setState({
         groups: this.createGroups(this.state.seatsInput)
@@ -118,12 +48,7 @@ class App extends Component {
     }
   }
 
-  isAllChildIsArray(array) {
-    let _return = true;
-    array.forEach(child => _return = _return && Array.isArray(child));
-    return _return;
-  }
-
+  // function to validate form before generate output
   isFormValid() {
     let seatsInput;
     let sumPassengersValidity = true;
@@ -170,6 +95,85 @@ class App extends Component {
 
     // result of form validity
     return seatsInputValidity && sumPassengersValidity;
+  }
+  
+  // function to create groups based on seats input
+  createGroups = (seatsInput) => {
+    const groups = JSON.parse(seatsInput);
+    return groups.map((group, groupIndex) => {
+      let seats = [];
+      const sumCol = group[0];
+      const sumRow = group[1];
+      for (let row=0; row<sumRow; row++) {
+        for (let col=0; col<sumCol; col++) {
+          seats.push({
+            row: row,
+            col: col,
+            type: this.identifySeatType(groupIndex, groups.length, col, sumCol),
+            passengerNumber: null
+          }) 
+        }
+      }
+      return {
+        sumCol: sumCol,
+        sumRow: sumRow,
+        seats: seats
+      };
+    });
+  }
+
+  // function to identify seat type (window, aisle, or middle)
+  identifySeatType(groupIndex, groupLength, colIndex, groupSumCol) {
+    const isLeftWindow = groupIndex===0 && colIndex===0;
+    const isRightWindow = groupIndex===groupLength-1 && colIndex===groupSumCol-1;
+    const isFirstColInGroup = colIndex===0;
+    const isLastColInGroup = colIndex===groupSumCol-1;
+    if (isLeftWindow || isRightWindow) {
+      return 'window'
+    } if (isFirstColInGroup || isLastColInGroup) {
+      return 'aisle'
+    } else {
+      return 'middle'
+    }
+  }
+
+  // function to fill passengerNumber for each seat with number between 1 and sumPassengers
+  identifyPassengersNumber(groups, sumPassengers) {
+    const maxRow = Math.max.apply(null, groups.map(el => el.sumRow));
+    let passengerNumber = 1;
+    const iterateBySeatType = (seatType) => {
+      for (let row=0; row<maxRow; row++) {
+        if (passengerNumber > sumPassengers) {break}
+        for (let groupIndex=0; groupIndex<groups.length; groupIndex++) {
+          if (passengerNumber > sumPassengers) {break}
+          const group = groups[groupIndex];
+          if (row < group.sumRow) {
+            for (let col=0; col<group.sumCol; col++){
+              if (passengerNumber > sumPassengers) {break}
+              const seatIndex = group.seats.findIndex(seat => seat.row===row && seat.col===col);
+              const seat = group.seats[seatIndex];
+              if (seat.type === seatType) {
+                seat.passengerNumber = passengerNumber;
+                passengerNumber++;
+              }
+            }
+          }
+        };
+      }
+    }
+    iterateBySeatType('aisle');
+    iterateBySeatType('window');
+    iterateBySeatType('middle');
+
+    // add delay 100ms to make sure groups is ready
+    setTimeout(() => {
+      this.setState({groups: groups}, () => {
+        // you can inspect this.state.groups after successfully generate output
+        // this code will print this.state.groups in console
+        console.clear();
+        console.log(this.state.groups);
+      });
+    }, 100)
   }
 
   render() {
