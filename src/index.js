@@ -56,7 +56,12 @@ class App extends Component {
     iterateBySeatType('window');
     iterateBySeatType('middle');
     setTimeout(() => {
-      this.setState({groups: groups});
+      this.setState({groups: groups}, () => {
+        // you can inspect this.state.groups after successfully generate output
+        // this code will print this.state.groups in console
+        console.clear();
+        console.log(this.state.groups);
+      });
     }, 100)
   }
 
@@ -77,25 +82,21 @@ class App extends Component {
 
   createGroups = (seatsInput) => {
     const groups = JSON.parse(seatsInput);
-    let colOffset = 0;
     return groups.map((group, groupIndex) => {
       let seats = [];
       const sumCol = group[0];
       const sumRow = group[1];
-      if (groupIndex > 0) {
-        colOffset += groups[groupIndex-1][0];
-      }
       for (let row=0; row<sumRow; row++) {
         for (let col=0; col<sumCol; col++) {
           seats.push({
             row: row,
             col: col,
-            type: this.identifySeatType(groupIndex, groups.length, col, sumCol)
+            type: this.identifySeatType(groupIndex, groups.length, col, sumCol),
+            passengerNumber: null
           }) 
         }
       }
       return {
-        colOffset: colOffset,
         sumCol: sumCol,
         sumRow: sumRow,
         seats: seats
